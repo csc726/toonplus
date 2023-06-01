@@ -277,7 +277,7 @@ function isValidNickname(nickname) {  //닉네임 유효성 검사 함수
     <td align=right>마이페이지 공개여부&nbsp;</td>
     <td><img src="/resources/images/qm.jpg" width="5px", height="5px" title='공개합니다'>
 <input type="radio" name="USER_MYPAGE" value="Y">공개
-           <input type="radio" name="USER_MYPAGE" value="N">비공개
+           <input type="radio" name="USER_MYPAGE" value="N">비공
 </tr>
 <tr>
     <td colspan=2 align=center height=50>
