@@ -10,9 +10,9 @@
 <form action="signup.jsp" method="post">
 <div style="text-align : center;">
 <img src="/resources/images/logo.jpg" width="300px", height="80px" >
-<select style="float : right;" onchange="if(this.value) location.href=(this.value);"> //옵션 클릭시 현재 창에서 출력
+<select style="float : right;" onchange="if(this.value) location.href=(this.value);"> <!-- 옵션 클릭시 현재 창에서 출력 -->
 		<option value="" >마이페이지</option>
-		<option value="user/update">개인정보 수정</option>  //회원정보 수정 페이지 출력
+		<option value="user/update">개인정보 수정</option>  <!-- 회원정보 수정 페이지 출력 -->
 		<option value="">로그아웃</option>
 </select>
 </div>
