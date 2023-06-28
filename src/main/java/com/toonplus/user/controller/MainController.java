@@ -1,5 +1,7 @@
 package com.toonplus.user.controller;
 
+import com.toonplus.email.dto.EmailVO;
+import com.toonplus.email.service.EmailServiceImpl;
 import com.toonplus.user.dto.User;
 import com.toonplus.user.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.Random;
 
 
 @Controller
@@ -16,6 +19,8 @@ public class MainController {
 
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private EmailServiceImpl emailService;
 
     @PostMapping("/user/checkId")  //아이디 체크
     @ResponseBody
@@ -32,10 +37,10 @@ public class MainController {
         return RESULT;
     }
 
-    @PostMapping("/user/checkEmail")	//이메일 체크
+    @PostMapping("/user/checkEmail")    //이메일 체크
     @ResponseBody
     public String checkEmail(User user, HttpSession session) {
-        String RESULT;
+        String RESULT = "";
         User sessionUser = (User) session.getAttribute("user");
         if (sessionUser != null) {
             user.setUSER_ID(sessionUser.getUSER_ID());
@@ -50,7 +55,25 @@ public class MainController {
         return RESULT;
     }
 
-    @PostMapping("/user/checkNickName")	//닉네임 체크
+    @PostMapping("/user/sendEmail")    //이메일 체크
+    @ResponseBody
+    public String sendEmail(User user, HttpSession session) {
+        String RESULT = "";
+        try {
+            String authNum = numberGen(6, 1);
+            EmailVO vo = new EmailVO(user.getUSER_MAIL(), "[toonplus] 인증메일입니다.", "[" + authNum + "]" + "입니다.");
+            emailService.sendSimpleMessage(vo);
+            RESULT = authNum;
+        } catch (Exception e) {
+            // TODO: handle exception
+            RESULT = "";
+        }
+
+        System.out.println("RESULT : " + RESULT);
+        return RESULT;
+    }
+
+    @PostMapping("/user/checkNickName")    //닉네임 체크
     @ResponseBody
     public String checkNickName(User user, HttpSession session) {
         String RESULT;
@@ -68,7 +91,7 @@ public class MainController {
         return RESULT;
     }
 
-    @PostMapping("/user/signup")	//회원가입하면 홈으로 다시 전송
+    @PostMapping("/user/signup")    //회원가입하면 홈으로 다시 전송
     public String signupPost(User user) {
         System.out.println(user.toString());
         userService.insertUser(user);
@@ -97,6 +120,12 @@ public class MainController {
         return "/user/updateForm";
     }
 
+    @GetMapping("/user/mypage")  //회원정보 수정 화면 띄우기
+    public String mypage() {
+
+        return "/user/myPage";
+    }
+
 
     @PostMapping("/user/login")
     @ResponseBody
@@ -112,7 +141,6 @@ public class MainController {
         System.out.println("RESULT : " + RESULT);
         return RESULT;
     }
-
 
 
     @GetMapping("/user/login")  //로그인 화면 띄우기
@@ -134,10 +162,32 @@ public class MainController {
     }
 
     @GetMapping("/user/pw")
-    public String pw(){
+    public String pw() {
         return "/user/pw";
     }
 
+    public static String numberGen(int len, int dupCd) {
+        Random rand = new Random();
+        String numStr = ""; //난수가 저장될 변수
+        for (int i = 0; i < len; i++) {
+            //0~9 까지 난수 생성
+            String ran = Integer.toString(rand.nextInt(10));
+            if (dupCd == 1) {
+                //중복 허용시 numStr에 append
+                numStr += ran;
+            } else if (dupCd == 2) {
+                //중복을 허용하지 않을시 중복된 값이 있는지 검사한다
+                if (!numStr.contains(ran)) {
+                    //중복된 값이 없으면 numStr에 append
+                    numStr += ran;
+                } else {
+                    //생성된 난수가 중복되면 루틴을 다시 실행한다
+                    i -= 1;
+                }
+            }
+        }
+        return numStr;
+    }
 
 
 }

@@ -54,7 +54,25 @@
                 async : false,
                 success : function(data) {
                     if (data == 'true') {
-                        alert('사용 가능한 이메일입니다.');
+                    	alert('사용 가능한 이메일입니다. 이메일 인증번호가 전송되었습니다.'); 
+                    	$("#areaAuth").css("display","table-row");
+        				$.ajax({  //이메일 중복여부 검사
+        					type : 'POST',
+        					url :  '/user/sendEmail',
+        					data : { USER_MAIL : $('#USER_MAIL').val()},
+        					dataType : "text",
+        					async : false,
+        					success : function(data) {
+        						if (data.length < 1) {
+        							alert("메일 전송에 실패했습니다.");
+        						} else {
+        							$("#authNum").val(data);
+        						}
+        						
+        					}, error : function (){
+        						alert("에러가 발생하였습니다.");
+        					}
+        				});
                         $("#checkEmailVal").val("Y");
                         $('#USER_MAIL').attr("disabled",true);
                     } else {
@@ -95,7 +113,17 @@
                 }
             });
         }
-
+        
+        function checkAuth(){
+        	if ($("#authNum").val() != $("#EMAIL_AUTH").val()) {
+        		alert('인증에 실패했습니다.');
+        		$("#EMAIL_AUTH").attr("disabled",false);
+        	} else {
+        		alert('인증에 성공했습니다.');
+        		$("#EMAIL_AUTH").attr("disabled",true);
+        		$("#checkEmailAuthVal").val("Y");
+        	}
+        }
         function checkAction(){
             var frmSubmit = document.frmSubmit;
             var PasswordValue = $('#USER_PASSWORD').val();
@@ -126,6 +154,10 @@
 
                 if ($("#checkEmailVal").val() === 'N') {
                 alert('이메일 중복 확인이 필요합니다.'); // 이메일 중복 확인이 눌리지 않은 경우 메시지 출력
+                return;
+            }
+                if ($("#checkEmailAuthVal").val() === 'N') {
+                alert('이메일 인증 확인이 필요합니다.'); // 이메일 인증 확인이 눌리지 않은 경우 메시지 출력
                 return;
             }
 
@@ -198,7 +230,9 @@
 <form action="signup" method="post" name="frmSubmit">
     <input type="hidden" id="checkIdVal" value="N"/>
     <input type="hidden" id="checkEmailVal" value="N"/>
+    <input type="hidden" id="checkEmailAuthVal" value="N"/>
     <input type="hidden" id="checkNickNameVal" value="N"/>
+    <input type="hidden" id="authNum" value="N">
     <div style="text-align: center;">
         <img src="/resources/images/logo.jpg" width="300px" height="80px" >
     </div>
@@ -215,34 +249,12 @@
             <td><input type="email" name="USER_MAIL" id="USER_MAIL">
                 <input type="button" value="중복 확인" onclick="javascript:checkEmail();"></td>
         </tr>
-
-        <div class="mb-1 ">
-            <div class="row">
-                <div class="col-sm-6">
-                    <input type="text" class="form-control " placeholder="Email" aria-label="Email"
-                           id="username">
-                </div>
-                <div class="col-sm-6 ms-0">
-                    <select class="form-select" aria-label="Default select example" id="freefix">
-                        <option selected>이메일 선택</option>
-                        <option value="@naver.com">@naver.com</option>
-                        <option value="@daum.net">@daum.net</option>
-                        <option value="@gmail.com">@gmail.com</option>
-                        <option value="@hamail.com">@hamail.com</option>
-                        <option value="@yahoo.com">@yahoo.com</option>
-                    </select>
-                </div>
-                <div class="col-sm-7 mt-3 me-3">
-                    <input class="form-control mail-check-input" placeholder="인증번호 "
-                           disabled="disabled" maxlength="7" onkeyup="checkAuthNumFn()">
-                </div>
-                <div class="col-sm-3 mt-3 ">
-                    <input type="button" class="btn btn-primary" id="mail-Check-btn" value="메일인증">
-                </div>
-                <span id="mail-check-warn" class="mb-2"></span>
-            </div>
-        </div>
-
+        <tr id="areaAuth" style="display: none;">
+            <td align=right></td>
+            <td><input type="text" name="EMAIL_AUTH" id="EMAIL_AUTH">
+            
+                <input type="button" value="인증 확인" onclick="javascript:checkAuth();"></td>
+        </tr>
         <tr>
             <td align=right>비밀번호</td>
             <td><input type="password" name="USER_PASSWORD" id="USER_PASSWORD"></td>

@@ -55,7 +55,20 @@ function checkEmail() {  //이메일 중복검사
 		async : false,
 		success : function(data) {
 			if (data == 'true') { 
-				alert('사용 가능한 이메일입니다.');
+				alert('사용 가능한 이메일입니다. 이메일 인증번호가 전송되었습니다.');
+				$.ajax({  //이메일 중복여부 검사
+					type : 'POST',
+					url :  '/user/sendEmail',
+					data : { USER_MAIL : $('#USER_MAIL').val()},
+					dataType : "text",
+					async : false,
+					success : function(data) {
+						alert(data);
+					}, error : function (){
+						alert("에러가 발생하였습니다.");
+					}
+				});
+						
 				$("#checkEmailVal").val("Y");
 				$('#USER_MAIL').attr("disabled",true);
 			} else {
